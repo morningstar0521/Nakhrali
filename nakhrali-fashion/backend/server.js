@@ -39,7 +39,13 @@ app.use(cors({
 }));
 
 // 🔥 REQUIRED FOR PREFLIGHT
-app.options('*', cors());
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 
 /* ======================================================
    BODY PARSER
