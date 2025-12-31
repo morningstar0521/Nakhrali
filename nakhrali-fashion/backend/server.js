@@ -16,29 +16,28 @@ connectDB();
 const app = express();
 
 /* ======================================================
-   CORS — MUST BE FIRST
+   1️⃣ CORS — MUST BE FIRST
 ====================================================== */
 const allowedOrigins = [
   'https://nakhrali-liart.vercel.app',
   'https://nakhrali-git-main-morningstar0521s-projects.vercel.app',
-  'https://*.vercel.app',
   'http://localhost:5173'
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.some(o => origin.includes(o.replace('*.', '')))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow server-to-server
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 🔥 REQUIRED FOR PREFLIGHT
+/* ======================================================
+   2️⃣ OPTIONS PREFLIGHT — MUST BE BEFORE RATE LIMIT
+====================================================== */
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
@@ -46,15 +45,14 @@ app.use((req, res, next) => {
   next();
 });
 
-
 /* ======================================================
-   BODY PARSER
+   3️⃣ BODY PARSER
 ====================================================== */
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /* ======================================================
-   HELMET — CSP FIXED FOR VERCEL + RENDER
+   4️⃣ HELMET — PROD SAFE
 ====================================================== */
 app.use(helmet({
   contentSecurityPolicy: {
@@ -68,7 +66,6 @@ app.use(helmet({
         "'self'",
         "https://nakhrali-fyev.onrender.com",
         "https://nakhrali-liart.vercel.app",
-        "https://*.vercel.app",
         "http://localhost:5173"
       ]
     }
@@ -78,7 +75,7 @@ app.use(helmet({
 }));
 
 /* ======================================================
-   RATE LIMITING
+   5️⃣ RATE LIMITING (AFTER OPTIONS)
 ====================================================== */
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -98,18 +95,18 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
 /* ======================================================
-   SECURITY
+   6️⃣ SECURITY
 ====================================================== */
 app.use(hpp());
 
 /* ======================================================
-   STATIC FILES
+   7️⃣ STATIC FILES
 ====================================================== */
 app.use('/uploads', express.static('uploads'));
 app.use('/uploads/profiles', express.static('uploads/profiles'));
 
 /* ======================================================
-   ROUTES
+   8️⃣ ROUTES
 ====================================================== */
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
@@ -122,7 +119,7 @@ app.use('/api/user', require('./routes/user'));
 app.use('/api/admin', require('./routes/admin'));
 
 /* ======================================================
-   HEALTH CHECK
+   9️⃣ HEALTH CHECK
 ====================================================== */
 app.get('/', (req, res) => {
   res.json({
@@ -133,7 +130,7 @@ app.get('/', (req, res) => {
 });
 
 /* ======================================================
-   404 + ERROR HANDLER
+   🔟 404 + ERROR HANDLER
 ====================================================== */
 app.use((req, res) => {
   res.status(404).json({
@@ -145,9 +142,10 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 /* ======================================================
-   START SERVER
+   🚀 START SERVER
 ====================================================== */
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV} on port ${PORT}`);
 });
+
