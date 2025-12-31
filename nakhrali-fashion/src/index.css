@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-body text-gray-800 bg-warm-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  /* Button Styles */
+  .btn-primary {
+    @apply bg-gold-500 text-gray-900 px-6 py-3 rounded-lg font-semibold 
+           hover:bg-gold-600 hover:shadow-gold transition-all duration-300 
+           hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary {
+    @apply bg-purple-500 text-white px-6 py-3 rounded-lg font-semibold 
+           hover:bg-purple-600 hover:shadow-purple transition-all duration-300 
+           hover:-translate-y-0.5;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-purple-500 text-purple-500 px-6 py-3 rounded-lg 
+           font-semibold hover:bg-purple-50 transition-all duration-300;
+  }
+  
+  /* Card Styles */
+  .card {
+    @apply bg-white rounded-xl border border-purple-100 shadow-sm 
+           hover:shadow-purple-lg transition-all duration-300 hover:-translate-y-1;
+  }
+  
+  /* Input Styles */
+  .input {
+    @apply w-full px-4 py-3 border border-purple-100 rounded-lg 
+           focus:outline-none focus:border-purple-500 focus:ring-2 
+           focus:ring-purple-200 transition-all duration-200;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-purple-500 to-gold-500 bg-clip-text text-transparent;
+  }
+  
+  .bg-gradient-purple-gold {
+    @apply bg-gradient-to-r from-purple-500 to-gold-500;
+  }
+}
